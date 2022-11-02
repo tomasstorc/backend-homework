@@ -9,6 +9,14 @@ import ErrorResponse from "../utils/errorResponse";
 
 const router = express.Router();
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
+}
+
 router.get("/", isAuthenticated, (req: Request, res: Response) => {
   ShoppingList.find(
     { owner: req.user.foundUser._id },

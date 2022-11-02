@@ -6,8 +6,5 @@ declare global {
       JWT_SECRET: string;
       DB_STRING: string;
     }
-    interface Request {
-      user?: any;
-    }
   }
 }
