@@ -9,6 +9,7 @@ import ErrorResponse from "../utils/errorResponse";
 
 const router = express.Router();
 
+// get all lists for user
 router.get("/", isAuthenticated, (req: Request, res: Response) => {
   ShoppingList.find(
     { owner: req.user.foundUser._id },
@@ -29,7 +30,7 @@ router.get("/", isAuthenticated, (req: Request, res: Response) => {
   );
 });
 
-// get
+// get list by id
 router.get(
   "/:id",
   isAuthenticated,
@@ -91,30 +92,25 @@ router.delete(
 );
 
 // update shopping list
-router.put(
-  "/:id",
-  isAuthenticated,
-  isOwnerOrContributor,
-  (req: Request, res: Response) => {
-    if (!req.body.name)
-      return res
-        .status(400)
-        .json(new ErrorResponse("error", ["new name not filled"]));
-    ShoppingList.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      (err: Error | undefined, updatedList: IShoppingList | undefined) => {
-        if (err) {
-          return res.status(400).json(new ErrorResponse("error", [err]));
-        } else {
-          return res
-            .status(200)
-            .json({ status: "updated", data: updatedList, errors: [] });
-        }
+router.put("/:id", isAuthenticated, isOwner, (req: Request, res: Response) => {
+  if (!req.body.name)
+    return res
+      .status(400)
+      .json(new ErrorResponse("error", ["new name not filled"]));
+  ShoppingList.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    (err: Error | undefined, updatedList: IShoppingList | undefined) => {
+      if (err) {
+        return res.status(400).json(new ErrorResponse("error", [err]));
+      } else {
+        return res
+          .status(200)
+          .json({ status: "updated", data: updatedList, errors: [] });
       }
-    );
-  }
-);
+    }
+  );
+});
 
 // add item to shopping list
 router.post(
@@ -197,6 +193,53 @@ router.get(
       req.params.listid,
       {
         $set: { "items.$": { _id: req.params.itemid, checked: true } },
+      },
+      (err: Error | undefined, updatedList: IShoppingList | undefined) => {
+        if (err) {
+          return res.status(400).json(new ErrorResponse("error", [err]));
+        } else {
+          return res
+            .status(200)
+            .json({ status: "updated", data: updatedList, errors: [] });
+        }
+      }
+    );
+  }
+);
+
+// add contributor
+router.post(
+  "/:listid/contributor",
+  isAuthenticated,
+  isOwner,
+  (req: Request, res: Response) => {
+    ShoppingList.findByIdAndUpdate(
+      req.params.listid,
+      {
+        $push: { contributors: req.body },
+      },
+      (err: Error | undefined, updatedList: IShoppingList | undefined) => {
+        if (err) {
+          return res.status(400).json(new ErrorResponse("error", [err]));
+        } else {
+          return res
+            .status(200)
+            .json({ status: "updated", data: updatedList, errors: [] });
+        }
+      }
+    );
+  }
+);
+
+router.delete(
+  "/:listid/contributor/:contributorid",
+  isAuthenticated,
+  isOwner,
+  (req: Request, res: Response) => {
+    ShoppingList.findByIdAndUpdate(
+      req.params.listid,
+      {
+        $pull: { contributors: { _id: req.params.contributorid } },
       },
       (err: Error | undefined, updatedList: IShoppingList | undefined) => {
         if (err) {

@@ -5,6 +5,7 @@ import ErrorResponse from "../utils/errorResponse";
 
 const isOwner = (req: Request, res: Response, next: NextFunction) => {
   const userId = req.user.foundUser._id;
+
   ShoppingList.findById(
     req.params.id,
     (err: Error | undefined, list: IShoppingList) => {
@@ -12,10 +13,10 @@ const isOwner = (req: Request, res: Response, next: NextFunction) => {
       if (!list)
         return res
           .status(404)
-          .json(
-            new ErrorResponse("error", ["no shopping list for given user"])
-          );
-      if (list.owner === userId) {
+          .json(new ErrorResponse("error", ["no shopping list with given id"]));
+      console.log(list.owner.toString());
+
+      if (list.owner.toString() === userId) {
         next();
       } else {
         res.status(401).json(new ErrorResponse("error", ["unauthorized"]));

@@ -13,8 +13,9 @@ var isOwner = function (req, res, next) {
         if (!list)
             return res
                 .status(404)
-                .json(new errorResponse_1.default("error", ["no shopping list for given user"]));
-        if (list.owner === userId) {
+                .json(new errorResponse_1.default("error", ["no shopping list with given id"]));
+        console.log(list.owner.toString());
+        if (list.owner.toString() === userId) {
             next();
         }
         else {

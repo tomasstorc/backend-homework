@@ -10,6 +10,7 @@ var isOwnerOrContributor_1 = __importDefault(require("../middleware/isOwnerOrCon
 var ShoppingList_1 = __importDefault(require("../model/ShoppingList"));
 var errorResponse_1 = __importDefault(require("../utils/errorResponse"));
 var router = express_1.default.Router();
+// get all lists for user
 router.get("/", isAuthenticated_1.default, function (req, res) {
     ShoppingList_1.default.find({ owner: req.user.foundUser._id }, function (err, lists) {
         if (err)
@@ -28,7 +29,7 @@ router.get("/", isAuthenticated_1.default, function (req, res) {
         }
     });
 });
-// get
+// get list by id
 router.get("/:id", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
     var listId = req.params.id;
     ShoppingList_1.default.findById(listId, function (err, list) {
@@ -77,7 +78,7 @@ router.delete("/:id", isAuthenticated_1.default, isOwner_1.default, function (re
     });
 });
 // update shopping list
-router.put("/:id", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
+router.put("/:id", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
     if (!req.body.name)
         return res
             .status(400)
@@ -141,6 +142,35 @@ router.delete("/:listid/item/:itemid", isAuthenticated_1.default, isOwnerOrContr
 router.get("/:listid/item/:itemid/mark", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
         $set: { "items.$": { _id: req.params.itemid, checked: true } },
+    }, function (err, updatedList) {
+        if (err) {
+            return res.status(400).json(new errorResponse_1.default("error", [err]));
+        }
+        else {
+            return res
+                .status(200)
+                .json({ status: "updated", data: updatedList, errors: [] });
+        }
+    });
+});
+// add contributor
+router.post("/:listid/contributor", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
+    ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
+        $push: { contributors: req.body },
+    }, function (err, updatedList) {
+        if (err) {
+            return res.status(400).json(new errorResponse_1.default("error", [err]));
+        }
+        else {
+            return res
+                .status(200)
+                .json({ status: "updated", data: updatedList, errors: [] });
+        }
+    });
+});
+router.delete("/:listid/contributor/:contributorid", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
+    ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
+        $pull: { contributors: { _id: req.params.contributorid } },
     }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
