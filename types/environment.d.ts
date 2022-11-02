@@ -7,4 +7,9 @@ declare global {
       DB_STRING: string;
     }
   }
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
 }
