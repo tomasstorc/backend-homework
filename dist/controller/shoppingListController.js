@@ -30,8 +30,8 @@ router.get("/", isAuthenticated_1.default, function (req, res) {
     });
 });
 // get list by id
-router.get("/:id", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
-    var listId = req.params.id;
+router.get("/:listid", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
+    var listId = req.params.listid;
     ShoppingList_1.default.findById(listId, function (err, list) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
@@ -67,8 +67,8 @@ router.post("/", isAuthenticated_1.default, function (req, res) {
     });
 });
 // delete shopping list
-router.delete("/:id", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
-    ShoppingList_1.default.findByIdAndDelete(req.params.id, function (err) {
+router.delete("/:listid", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
+    ShoppingList_1.default.findByIdAndDelete(req.params.listid, function (err) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
@@ -78,12 +78,12 @@ router.delete("/:id", isAuthenticated_1.default, isOwner_1.default, function (re
     });
 });
 // update shopping list
-router.put("/:id", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
+router.put("/:listid", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
     if (!req.body.name)
         return res
             .status(400)
             .json(new errorResponse_1.default("error", ["new name not filled"]));
-    ShoppingList_1.default.findByIdAndUpdate(req.params.id, req.body, function (err, updatedList) {
+    ShoppingList_1.default.findByIdAndUpdate(req.params.listid, req.body, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
@@ -111,8 +111,11 @@ router.post("/:listid/item", isAuthenticated_1.default, isOwnerOrContributor_1.d
 });
 // rename item in shopping list
 router.put("/:listid/item/:itemid", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
+    console.log(req.body);
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
-        $set: { "items.$": { _id: req.params.itemid, name: req.body.name } },
+        $set: {
+            items: { _id: req.params.itemid, name: req.body.name },
+        },
     }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
@@ -139,9 +142,10 @@ router.delete("/:listid/item/:itemid", isAuthenticated_1.default, isOwnerOrContr
         }
     });
 });
+// chck item in shopping list
 router.get("/:listid/item/:itemid/mark", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
-        $set: { "items.$": { _id: req.params.itemid, checked: true } },
+        $set: { items: { _id: req.params.itemid, checked: true } },
     }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));

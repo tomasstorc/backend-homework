@@ -10,8 +10,10 @@ const isOwnerOrContributor = (
 ) => {
   const userId = req.user.foundUser._id;
   ShoppingList.findById(
-    req.params.id,
+    req.params.listid,
     (err: Error | undefined, list: IShoppingList) => {
+      console.log(list);
+
       if (err) return res.status(400).json(new ErrorResponse("error", [err]));
       if (!list)
         return res
@@ -19,7 +21,10 @@ const isOwnerOrContributor = (
           .json(
             new ErrorResponse("error", ["no shopping list for given user"])
           );
-      if (list.owner === userId || list.contributors.includes(userId)) {
+      if (
+        list.owner.toString() === userId ||
+        list.contributors.includes(userId)
+      ) {
         next();
       } else {
         res.status(401).json(new ErrorResponse("error", ["unauthorized"]));

@@ -29,7 +29,7 @@ var shoppingListSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     items: [Item_1.itemSchema],
     owner: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
-    contributors: { type: mongoose_1.Schema.Types.Mixed, ref: "User" },
+    contributors: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User" }],
 });
 var ShoppingList = mongoose_1.default.model("ShoppingList", shoppingListSchema);
 exports.default = ShoppingList;

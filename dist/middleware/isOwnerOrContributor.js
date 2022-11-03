@@ -7,14 +7,16 @@ var ShoppingList_1 = __importDefault(require("../model/ShoppingList"));
 var errorResponse_1 = __importDefault(require("../utils/errorResponse"));
 var isOwnerOrContributor = function (req, res, next) {
     var userId = req.user.foundUser._id;
-    ShoppingList_1.default.findById(req.params.id, function (err, list) {
+    ShoppingList_1.default.findById(req.params.listid, function (err, list) {
+        console.log(list);
         if (err)
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         if (!list)
             return res
                 .status(404)
                 .json(new errorResponse_1.default("error", ["no shopping list for given user"]));
-        if (list.owner === userId || list.contributors.includes(userId)) {
+        if (list.owner.toString() === userId ||
+            list.contributors.includes(userId)) {
             next();
         }
         else {

@@ -32,13 +32,14 @@ router.get("/", isAuthenticated, (req: Request, res: Response) => {
 
 // get list by id
 router.get(
-  "/:id",
+  "/:listid",
   isAuthenticated,
   isOwnerOrContributor,
   (req: Request, res: Response) => {
-    const listId = req.params.id;
+    const listId = req.params.listid;
     ShoppingList.findById(
       listId,
+
       (err: Error | undefined, list: IShoppingList | undefined) => {
         if (err) {
           return res.status(400).json(new ErrorResponse("error", [err]));
@@ -77,40 +78,49 @@ router.post("/", isAuthenticated, (req: Request, res: Response) => {
 
 // delete shopping list
 router.delete(
-  "/:id",
+  "/:listid",
   isAuthenticated,
   isOwner,
   (req: Request, res: Response) => {
-    ShoppingList.findByIdAndDelete(req.params.id, (err: Error | undefined) => {
-      if (err) {
-        return res.status(400).json(new ErrorResponse("error", [err]));
-      } else {
-        return res.status(200).json({ status: "deleted", errors: [] });
+    ShoppingList.findByIdAndDelete(
+      req.params.listid,
+      (err: Error | undefined) => {
+        if (err) {
+          return res.status(400).json(new ErrorResponse("error", [err]));
+        } else {
+          return res.status(200).json({ status: "deleted", errors: [] });
+        }
       }
-    });
+    );
   }
 );
 
 // update shopping list
-router.put("/:id", isAuthenticated, isOwner, (req: Request, res: Response) => {
-  if (!req.body.name)
-    return res
-      .status(400)
-      .json(new ErrorResponse("error", ["new name not filled"]));
-  ShoppingList.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    (err: Error | undefined, updatedList: IShoppingList | undefined) => {
-      if (err) {
-        return res.status(400).json(new ErrorResponse("error", [err]));
-      } else {
-        return res
-          .status(200)
-          .json({ status: "updated", data: updatedList, errors: [] });
+router.put(
+  "/:listid",
+  isAuthenticated,
+  isOwner,
+  (req: Request, res: Response) => {
+    if (!req.body.name)
+      return res
+        .status(400)
+        .json(new ErrorResponse("error", ["new name not filled"]));
+    ShoppingList.findByIdAndUpdate(
+      req.params.listid,
+      req.body,
+
+      (err: Error | undefined, updatedList: IShoppingList | undefined) => {
+        if (err) {
+          return res.status(400).json(new ErrorResponse("error", [err]));
+        } else {
+          return res
+            .status(200)
+            .json({ status: "updated", data: updatedList, errors: [] });
+        }
       }
-    }
-  );
-});
+    );
+  }
+);
 
 // add item to shopping list
 router.post(
@@ -120,6 +130,7 @@ router.post(
   (req: Request, res: Response) => {
     ShoppingList.findByIdAndUpdate(
       req.params.listid,
+
       {
         $push: { items: req.body },
       },
@@ -142,10 +153,15 @@ router.put(
   isAuthenticated,
   isOwnerOrContributor,
   (req: Request, res: Response) => {
+    console.log(req.body);
+
     ShoppingList.findByIdAndUpdate(
       req.params.listid,
+
       {
-        $set: { "items.$": { _id: req.params.itemid, name: req.body.name } },
+        $set: {
+          items: { _id: req.params.itemid, name: req.body.name },
+        },
       },
       (err: Error | undefined, updatedList: IShoppingList | undefined) => {
         if (err) {
@@ -168,6 +184,7 @@ router.delete(
   (req: Request, res: Response) => {
     ShoppingList.findByIdAndUpdate(
       req.params.listid,
+
       {
         $pull: { items: { _id: req.params.itemid } },
       },
@@ -184,6 +201,7 @@ router.delete(
   }
 );
 
+// chck item in shopping list
 router.get(
   "/:listid/item/:itemid/mark",
   isAuthenticated,
@@ -191,8 +209,9 @@ router.get(
   (req: Request, res: Response) => {
     ShoppingList.findByIdAndUpdate(
       req.params.listid,
+
       {
-        $set: { "items.$": { _id: req.params.itemid, checked: true } },
+        $set: { items: { _id: req.params.itemid, checked: true } },
       },
       (err: Error | undefined, updatedList: IShoppingList | undefined) => {
         if (err) {

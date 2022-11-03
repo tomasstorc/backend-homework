@@ -7,7 +7,7 @@ const isOwner = (req: Request, res: Response, next: NextFunction) => {
   const userId = req.user.foundUser._id;
 
   ShoppingList.findById(
-    req.params.id,
+    req.params.listid,
     (err: Error | undefined, list: IShoppingList) => {
       if (err) return res.status(400).json(new ErrorResponse("error", [err]));
       if (!list)
