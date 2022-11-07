@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ShoppingList_1 = __importDefault(require("../model/ShoppingList"));
 var errorResponse_1 = __importDefault(require("../utils/errorResponse"));
 var isOwnerOrContributor = function (req, res, next) {
+    console.log(req.params.listid);
     var userId = req.user.foundUser._id;
     ShoppingList_1.default.findById(req.params.listid, function (err, list) {
         console.log(list);

@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import { CallbackError } from "mongoose";
 import IShoppingList from "../interface/shoppingList";
 
 import isAuthenticated from "../middleware/isAuthenticated";
@@ -108,8 +109,11 @@ router.put(
     ShoppingList.findByIdAndUpdate(
       req.params.listid,
       req.body,
-
-      (err: Error | undefined, updatedList: IShoppingList | undefined) => {
+      { new: true, rawResult: true },
+      (
+        err: Error | undefined | CallbackError,
+        updatedList: IShoppingList | undefined
+      ) => {
         if (err) {
           return res.status(400).json(new ErrorResponse("error", [err]));
         } else {
@@ -134,7 +138,11 @@ router.post(
       {
         $push: { items: req.body },
       },
-      (err: Error | undefined, updatedList: IShoppingList | undefined) => {
+      { new: true, rawResult: true },
+      (
+        err: Error | undefined | CallbackError,
+        updatedList: IShoppingList | undefined
+      ) => {
         if (err) {
           return res.status(400).json(new ErrorResponse("error", [err]));
         } else {
@@ -163,7 +171,11 @@ router.put(
           items: { _id: req.params.itemid, name: req.body.name },
         },
       },
-      (err: Error | undefined, updatedList: IShoppingList | undefined) => {
+      { new: true, rawResult: true },
+      (
+        err: Error | undefined | CallbackError,
+        updatedList: IShoppingList | undefined
+      ) => {
         if (err) {
           return res.status(400).json(new ErrorResponse("error", [err]));
         } else {
@@ -194,14 +206,14 @@ router.delete(
         } else {
           return res
             .status(200)
-            .json({ status: "updated", data: updatedList, errors: [] });
+            .json({ status: "deleted", data: updatedList, errors: [] });
         }
       }
     );
   }
 );
 
-// chck item in shopping list
+// check item in shopping list
 router.get(
   "/:listid/item/:itemid/mark",
   isAuthenticated,
@@ -213,7 +225,11 @@ router.get(
       {
         $set: { items: { _id: req.params.itemid, checked: true } },
       },
-      (err: Error | undefined, updatedList: IShoppingList | undefined) => {
+      { new: true, rawResult: true },
+      (
+        err: Error | undefined | CallbackError,
+        updatedList: IShoppingList | undefined
+      ) => {
         if (err) {
           return res.status(400).json(new ErrorResponse("error", [err]));
         } else {
@@ -237,19 +253,22 @@ router.post(
       {
         $push: { contributors: req.body },
       },
-      (err: Error | undefined, updatedList: IShoppingList | undefined) => {
+      { new: true, rawResult: true },
+      (
+        err: Error | undefined | CallbackError,
+        updatedList: IShoppingList | undefined
+      ) => {
         if (err) {
           return res.status(400).json(new ErrorResponse("error", [err]));
         } else {
-          return res
-            .status(200)
-            .json({ status: "updated", data: updatedList, errors: [] });
+          return res.status(204).json({ status: "updated", errors: [] });
         }
       }
     );
   }
 );
 
+// delete contributor
 router.delete(
   "/:listid/contributor/:contributorid",
   isAuthenticated,
@@ -264,9 +283,7 @@ router.delete(
         if (err) {
           return res.status(400).json(new ErrorResponse("error", [err]));
         } else {
-          return res
-            .status(200)
-            .json({ status: "updated", data: updatedList, errors: [] });
+          return res.status(204).json({ status: "updated", errors: [] });
         }
       }
     );

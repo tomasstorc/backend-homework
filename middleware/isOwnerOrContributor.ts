@@ -8,6 +8,8 @@ const isOwnerOrContributor = (
   res: Response,
   next: NextFunction
 ) => {
+  console.log(req.params.listid);
+
   const userId = req.user.foundUser._id;
   ShoppingList.findById(
     req.params.listid,

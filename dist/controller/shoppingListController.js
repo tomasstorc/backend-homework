@@ -83,7 +83,7 @@ router.put("/:listid", isAuthenticated_1.default, isOwner_1.default, function (r
         return res
             .status(400)
             .json(new errorResponse_1.default("error", ["new name not filled"]));
-    ShoppingList_1.default.findByIdAndUpdate(req.params.listid, req.body, function (err, updatedList) {
+    ShoppingList_1.default.findByIdAndUpdate(req.params.listid, req.body, { new: true, rawResult: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
@@ -98,7 +98,7 @@ router.put("/:listid", isAuthenticated_1.default, isOwner_1.default, function (r
 router.post("/:listid/item", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
         $push: { items: req.body },
-    }, function (err, updatedList) {
+    }, { new: true, rawResult: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
@@ -116,7 +116,7 @@ router.put("/:listid/item/:itemid", isAuthenticated_1.default, isOwnerOrContribu
         $set: {
             items: { _id: req.params.itemid, name: req.body.name },
         },
-    }, function (err, updatedList) {
+    }, { new: true, rawResult: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
@@ -138,15 +138,15 @@ router.delete("/:listid/item/:itemid", isAuthenticated_1.default, isOwnerOrContr
         else {
             return res
                 .status(200)
-                .json({ status: "updated", data: updatedList, errors: [] });
+                .json({ status: "deleted", data: updatedList, errors: [] });
         }
     });
 });
-// chck item in shopping list
+// check item in shopping list
 router.get("/:listid/item/:itemid/mark", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
         $set: { items: { _id: req.params.itemid, checked: true } },
-    }, function (err, updatedList) {
+    }, { new: true, rawResult: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
@@ -161,17 +161,16 @@ router.get("/:listid/item/:itemid/mark", isAuthenticated_1.default, isOwnerOrCon
 router.post("/:listid/contributor", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
         $push: { contributors: req.body },
-    }, function (err, updatedList) {
+    }, { new: true, rawResult: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
         else {
-            return res
-                .status(200)
-                .json({ status: "updated", data: updatedList, errors: [] });
+            return res.status(204).json({ status: "updated", errors: [] });
         }
     });
 });
+// delete contributor
 router.delete("/:listid/contributor/:contributorid", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
         $pull: { contributors: { _id: req.params.contributorid } },
@@ -180,9 +179,7 @@ router.delete("/:listid/contributor/:contributorid", isAuthenticated_1.default, 
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
         else {
-            return res
-                .status(200)
-                .json({ status: "updated", data: updatedList, errors: [] });
+            return res.status(204).json({ status: "updated", errors: [] });
         }
     });
 });
