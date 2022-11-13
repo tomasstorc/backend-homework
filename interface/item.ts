@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-export default interface IItem extends mongoose.Document {
+export default interface IItem {
   name: string;
   checked: boolean;
 }
