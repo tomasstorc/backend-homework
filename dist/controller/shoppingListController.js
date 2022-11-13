@@ -83,14 +83,14 @@ router.put("/:listid", isAuthenticated_1.default, isOwner_1.default, function (r
         return res
             .status(400)
             .json(new errorResponse_1.default("error", ["new name not filled"]));
-    ShoppingList_1.default.findByIdAndUpdate(req.params.listid, req.body, { new: true, rawResult: true }, function (err, updatedList) {
+    ShoppingList_1.default.findByIdAndUpdate(req.params.listid, req.body, { new: true, rawResult: true, runValidators: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
         else {
             return res
                 .status(200)
-                .json({ status: "updated", data: updatedList, errors: [] });
+                .json({ status: "updated", data: updatedList === null || updatedList === void 0 ? void 0 : updatedList.value, errors: [] });
         }
     });
 });
@@ -98,7 +98,7 @@ router.put("/:listid", isAuthenticated_1.default, isOwner_1.default, function (r
 router.post("/:listid/item", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
         $push: { items: req.body },
-    }, { new: true, rawResult: true }, function (err, updatedList) {
+    }, { new: true, rawResult: true, runValidators: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
@@ -116,7 +116,7 @@ router.put("/:listid/item/:itemid", isAuthenticated_1.default, isOwnerOrContribu
         $set: {
             items: { _id: req.params.itemid, name: req.body.name },
         },
-    }, { new: true, rawResult: true }, function (err, updatedList) {
+    }, { new: true, rawResult: true, runValidators: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
@@ -146,7 +146,7 @@ router.delete("/:listid/item/:itemid", isAuthenticated_1.default, isOwnerOrContr
 router.get("/:listid/item/:itemid/mark", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
         $set: { items: { _id: req.params.itemid, checked: true } },
-    }, { new: true, rawResult: true }, function (err, updatedList) {
+    }, { new: true, rawResult: true, runValidators: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
@@ -161,7 +161,7 @@ router.get("/:listid/item/:itemid/mark", isAuthenticated_1.default, isOwnerOrCon
 router.post("/:listid/contributor", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
         $push: { contributors: req.body },
-    }, { new: true, rawResult: true }, function (err, updatedList) {
+    }, { new: true, rawResult: true, runValidators: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }
@@ -174,7 +174,7 @@ router.post("/:listid/contributor", isAuthenticated_1.default, isOwner_1.default
 router.delete("/:listid/contributor/:contributorid", isAuthenticated_1.default, isOwner_1.default, function (req, res) {
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
         $pull: { contributors: { _id: req.params.contributorid } },
-    }, function (err, updatedList) {
+    }, { new: true, rawResult: true, runValidators: true, upsert: true }, function (err, updatedList) {
         if (err) {
             return res.status(400).json(new errorResponse_1.default("error", [err]));
         }

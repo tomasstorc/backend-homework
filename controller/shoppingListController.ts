@@ -109,17 +109,14 @@ router.put(
     ShoppingList.findByIdAndUpdate(
       req.params.listid,
       req.body,
-      { new: true, rawResult: true },
-      (
-        err: Error | undefined | CallbackError,
-        updatedList: IShoppingList | undefined
-      ) => {
+      { new: true, rawResult: true, runValidators: true },
+      (err: Error | undefined | CallbackError, updatedList: any) => {
         if (err) {
           return res.status(400).json(new ErrorResponse("error", [err]));
         } else {
           return res
             .status(200)
-            .json({ status: "updated", data: updatedList, errors: [] });
+            .json({ status: "updated", data: updatedList?.value, errors: [] });
         }
       }
     );
@@ -138,7 +135,7 @@ router.post(
       {
         $push: { items: req.body },
       },
-      { new: true, rawResult: true },
+      { new: true, rawResult: true, runValidators: true },
       (
         err: Error | undefined | CallbackError,
         updatedList: IShoppingList | undefined
@@ -171,7 +168,7 @@ router.put(
           items: { _id: req.params.itemid, name: req.body.name },
         },
       },
-      { new: true, rawResult: true },
+      { new: true, rawResult: true, runValidators: true },
       (
         err: Error | undefined | CallbackError,
         updatedList: IShoppingList | undefined
@@ -225,7 +222,7 @@ router.get(
       {
         $set: { items: { _id: req.params.itemid, checked: true } },
       },
-      { new: true, rawResult: true },
+      { new: true, rawResult: true, runValidators: true },
       (
         err: Error | undefined | CallbackError,
         updatedList: IShoppingList | undefined
@@ -253,7 +250,7 @@ router.post(
       {
         $push: { contributors: req.body },
       },
-      { new: true, rawResult: true },
+      { new: true, rawResult: true, runValidators: true },
       (
         err: Error | undefined | CallbackError,
         updatedList: IShoppingList | undefined
@@ -279,7 +276,11 @@ router.delete(
       {
         $pull: { contributors: { _id: req.params.contributorid } },
       },
-      (err: Error | undefined, updatedList: IShoppingList | undefined) => {
+      { new: true, rawResult: true, runValidators: true, upsert: true },
+      (
+        err: CallbackError | undefined,
+        updatedList: IShoppingList | undefined
+      ) => {
         if (err) {
           return res.status(400).json(new ErrorResponse("error", [err]));
         } else {
