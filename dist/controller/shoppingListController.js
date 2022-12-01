@@ -111,7 +111,6 @@ router.post("/:listid/item", isAuthenticated_1.default, isOwnerOrContributor_1.d
 });
 // rename item in shopping list
 router.put("/:listid/item/:itemid", isAuthenticated_1.default, isOwnerOrContributor_1.default, function (req, res) {
-    console.log(req.body);
     ShoppingList_1.default.findByIdAndUpdate(req.params.listid, {
         $set: {
             items: { _id: req.params.itemid, name: req.body.name },

@@ -9,7 +9,6 @@ const router = express.Router();
 
 router.post("/register", (req: Request, res: Response) => {
   const body = req.body;
-  console.log(req.body);
 
   if (!(body.username || body.password)) {
     res

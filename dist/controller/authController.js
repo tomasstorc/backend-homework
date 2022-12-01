@@ -10,7 +10,6 @@ var User_1 = __importDefault(require("../model/User"));
 var router = express_1.default.Router();
 router.post("/register", function (req, res) {
     var body = req.body;
-    console.log(req.body);
     if (!(body.username || body.password)) {
         res
             .status(400)

@@ -158,8 +158,6 @@ router.put(
   isAuthenticated,
   isOwnerOrContributor,
   (req: Request, res: Response) => {
-    console.log(req.body);
-
     ShoppingList.findByIdAndUpdate(
       req.params.listid,
 
